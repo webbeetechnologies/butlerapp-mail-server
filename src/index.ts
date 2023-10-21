@@ -1,6 +1,6 @@
 import "dotenv/config";
-import "./db/mongoose";
 
+// import "./db/mongoose";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";

@@ -58,3 +58,23 @@ export const sendResetPasswordTokenMail = async (user: { email: string; token: s
         console.log(e);
     }
 };
+
+export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+    try {
+        const mail = await transporter.sendMail({
+            from: MAIL_FROM || MAIL_USER,
+            to: form.email,
+            subject: "Contact from bulterapp website",
+            text: `
+            Contact Info: 
+            ${JSON.stringify(form)}
+            `,
+        });
+
+        if (!mail.accepted.length) {
+            throw new Error("Something went wrong while sending the mail. Try again later.");
+        }
+    } catch (e) {
+        console.log(e);
+    }
+};

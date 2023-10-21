@@ -1,0 +1,13 @@
+import { Request, Response } from "express";
+
+import { sendContactMail } from "../mail";
+
+export const contactEmail = async (req: Request, res: Response): Promise<any> => {
+    try {
+        await sendContactMail({ ...req.body });
+
+        return res.send({ message: "Success" });
+    } catch (e) {
+        return res.status(500).send();
+    }
+};
