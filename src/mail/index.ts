@@ -9,6 +9,7 @@ import {
     MAIL_PASSWORD,
     MAIL_PORT,
     MAIL_SECURE,
+    MAIL_TO,
     MAIL_USER,
     SITE_NAME,
 } from "@/utils/constants";
@@ -63,7 +64,7 @@ export const sendContactMail = async (form: { email: string; phone: string; [key
     try {
         const mail = await transporter.sendMail({
             from: MAIL_FROM || MAIL_USER,
-            to: form.email,
+            to: MAIL_TO,
             subject: "Contact from bulterapp website",
             text: `
             Contact Info: 

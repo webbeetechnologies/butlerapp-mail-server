@@ -12,5 +12,6 @@ export const MAIL_SECURE = process.env.MAIL_SECURE === "true";
 export const MAIL_USER = process.env.MAIL_USER;
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
 export const MAIL_FROM = process.env.MAIL_FROM;
+export const MAIL_TO = process.env.MAIL_TO;
 
 export const SITE_NAME = "My Site";
