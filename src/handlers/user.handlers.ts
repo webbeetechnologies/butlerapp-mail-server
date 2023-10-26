@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { IUserAuthRequest } from "@/interfaces/user.interface";
 import User from "@/models/user.model";
 
-import { sendResetPasswordTokenMail } from "../mail";
+// import { sendResetPasswordTokenMail } from "../mail";
 
 export const createUser = async (req: Request, res: Response): Promise<any> => {
     const user = new User(req.body);
@@ -60,7 +60,7 @@ export const forgetPassword = async (req: Request, res: Response): Promise<any> 
     try {
         const { token, expiresAt } = await user.generateResetPasswordToken();
 
-        await sendResetPasswordTokenMail({ email: req.body.email, token });
+        // await sendResetPasswordTokenMail({ email: req.body.email, token });
 
         return res.send({ token, expiresAt });
     } catch (e) {
