@@ -68,7 +68,7 @@ export const sendContactMail = async (form: { email: string; phone: string; [key
             subject: "Contact from bulterapp website",
             text: `
             Contact Info: 
-            ${JSON.stringify(form)}
+            ${JSON.stringify({ ...form })}
             `,
         });
 
