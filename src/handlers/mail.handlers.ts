@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import ip from 'ip'
 
 import { sendContactMail } from "../mail";
 
 export const contactEmail = async (req: Request, res: Response): Promise<any> => {
     try {
         await sendContactMail({ ...req.body,
-           clientIPAddress: ip.address()
+            ipAddress: req.ip,
+            xForwardedForIP: req.headers['x-forwarded-for'] || req.socket.remoteAddress
         });
 
         return res.send({ message: "Success" });
