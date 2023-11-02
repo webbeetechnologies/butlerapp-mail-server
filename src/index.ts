@@ -24,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", routes);
 
+app.set('trust proxy', 'loopback');
+
 app.get("/", (req, res) => {
     const text = "hello";
     res.status(200).send(text);
