@@ -14,4 +14,7 @@ export const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
 export const MAIL_FROM = process.env.MAIL_FROM;
 export const MAIL_TO = process.env.MAIL_TO;
 
+export const MATTERMOST_MAIL_BOT_ACCESS_TOKEN = process.env.MATTERMOST_MAIL_BOT_ACCESS_TOKEN;
+
+
 export const SITE_NAME = "My Site";
