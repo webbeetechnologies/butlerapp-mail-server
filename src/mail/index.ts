@@ -1,6 +1,8 @@
 // import fs from "fs";
 import nodemailer from "nodemailer";
 // import path from "path";
+import axios from 'axios'
+const MATTERMOST_INBOUNDS_CHANNEL_ID = 'pp9amtzhebdy8bi7ikz6m3jjgw';
 
 import {
     // CLIENT_ADDRESS,
@@ -10,7 +12,7 @@ import {
     MAIL_PORT,
     MAIL_SECURE,
     MAIL_TO,
-    MAIL_USER,
+    MAIL_USER, MATTERMOST_MAIL_BOT_ACCESS_TOKEN,
     // SITE_NAME,
 } from "@/utils/constants";
 
@@ -61,16 +63,27 @@ export const transporter = nodemailer.createTransport(mailConfig);
 // };
 
 export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+    const text = `
+            Contact Info: 
+            ${JSON.stringify({ ...form }, null, 4)}
+            `;
+
     try {
         const mail = await transporter.sendMail({
             from: MAIL_FROM || MAIL_USER,
             to: MAIL_TO,
             subject: "Contact from bulterapp website",
-            text: `
-            Contact Info: 
-            ${JSON.stringify({ ...form }, null, 4)}
-            `,
+            text,
         });
+
+        await axios.post('https://mattermost.bambooapp.ai/api/v4/posts', {
+            "channel_id": MATTERMOST_INBOUNDS_CHANNEL_ID,
+            "message": text
+        }, {
+            headers: {
+                Authorization: `Bearer ${MATTERMOST_MAIL_BOT_ACCESS_TOKEN}`
+            }
+        })
 
         if (!mail.accepted.length) {
             throw new Error("Something went wrong while sending the mail. Try again later.");
