@@ -43,6 +43,8 @@
     "express": "^4.17.1",
     "express-async-handler": "^1.2.0",
     "fs": "^0.0.1-security",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.4.2",
