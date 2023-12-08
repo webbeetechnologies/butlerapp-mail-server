@@ -179,6 +179,21 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
 };
 
 export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+    const findRecordQuery = `
+    query{
+        ${BAMBOO_TABLE_SLUG}(filtersSet: {conjunction: and, filtersSet: [{field: _apEMail_fldViznFWpT4RVJnZ, operator: "contains", value: ["${form.email}"]}]}){
+         records{
+          result{
+            id
+          }
+        }
+        }
+      }
+    `;
+
+    const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
+    const isExistingRecord = res[BAMBOO_TABLE_SLUG].records.result[0]?.id;
+
     await sendDataToBambooTable(form);
-    await sendMail(form);
+    if (!isExistingRecord) await sendMail(form);
 };
