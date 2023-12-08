@@ -12,6 +12,7 @@ export const contactEmail = async (req: Request, res: Response): Promise<any> =>
 
         return res.send({ message: "Success" });
     } catch (e) {
+        console.log(e);
         return res.status(500).send();
     }
 };
