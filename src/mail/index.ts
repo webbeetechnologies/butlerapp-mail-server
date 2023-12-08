@@ -148,7 +148,7 @@ const sendDataToBambooTable = async (form: { email: string; phone: string; [key:
         }
         `;
 
-        const res = await request(`ASDAD${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, mutationQuery);
+        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, mutationQuery);
         console.log("GraphQL Response:", res);
     } catch (error) {
         console.log(error);
