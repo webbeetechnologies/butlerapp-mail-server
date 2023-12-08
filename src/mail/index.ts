@@ -1,10 +1,15 @@
 // import fs from "fs";
-import nodemailer from "nodemailer";
 // import path from "path";
-import axios from 'axios'
-const MATTERMOST_INBOUNDS_CHANNEL_ID = 'pp9amtzhebdy8bi7ikz6m3jjgw';
+import axios from "axios";
+import nodemailer from "nodemailer";
+const MATTERMOST_INBOUNDS_CHANNEL_ID = "pp9amtzhebdy8bi7ikz6m3jjgw";
+
+import request from "graphql-request";
 
 import {
+    BAMBOO_SERVER_APP_ID,
+    BAMBOO_SERVER_HOST,
+    BAMBOO_TABLE_SLUG,
     // CLIENT_ADDRESS,
     MAIL_FROM,
     MAIL_HOST,
@@ -12,9 +17,11 @@ import {
     MAIL_PORT,
     MAIL_SECURE,
     MAIL_TO,
-    MAIL_USER, MATTERMOST_MAIL_BOT_ACCESS_TOKEN,
-    // SITE_NAME,
+    MAIL_USER,
+    MATTERMOST_MAIL_BOT_ACCESS_TOKEN,
 } from "@/utils/constants";
+
+import { normalizeString, stringifyForGraphQL } from "./utils";
 
 // import { resetMailText } from "./texts";
 
@@ -62,13 +69,13 @@ export const transporter = nodemailer.createTransport(mailConfig);
 //     }
 // };
 
-export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
-    const text = `
+const sendMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+    try {
+        const text = `
             Contact Info: 
             ${JSON.stringify({ ...form }, null, 4)}
             `;
 
-    try {
         const mail = await transporter.sendMail({
             from: MAIL_FROM || MAIL_USER,
             to: MAIL_TO,
@@ -76,19 +83,78 @@ export const sendContactMail = async (form: { email: string; phone: string; [key
             text,
         });
 
-        await axios.post('https://mattermost.bambooapp.ai/api/v4/posts', {
-            "channel_id": MATTERMOST_INBOUNDS_CHANNEL_ID,
-            "message": text
-        }, {
-            headers: {
-                Authorization: `Bearer ${MATTERMOST_MAIL_BOT_ACCESS_TOKEN}`
+        await axios.post(
+            "https://mattermost.bambooapp.ai/api/v4/posts",
+            {
+                channel_id: MATTERMOST_INBOUNDS_CHANNEL_ID,
+                message: text,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MATTERMOST_MAIL_BOT_ACCESS_TOKEN}`,
+                },
             }
-        })
+        );
 
         if (!mail.accepted.length) {
             throw new Error("Something went wrong while sending the mail. Try again later.");
         }
-    } catch (e) {
-        console.log(e);
+    } catch (error) {
+        console.log(error);
     }
+};
+
+const sendDataToBambooTable = async (form: { email: string; phone: string; [key: string]: any }) => {
+    try {
+        const selectedFieldNames = Object.keys(form);
+
+        const csvString = selectedFieldNames
+            .map((key) => {
+                const value = form[key as keyof typeof form];
+                if (typeof value === "string") return normalizeString(value);
+                if (value && typeof value === "object") return stringifyForGraphQL(value);
+                return value;
+            })
+            .join("\t");
+
+        // Send graphql to bamboo
+        const mutationQuery = `
+        mutation{
+            csvImporter(
+            tableName:${BAMBOO_TABLE_SLUG},
+            selectedFieldNames:${JSON.stringify(selectedFieldNames)},
+            startRecordOffset:0,
+            numberOfRecordsToUpdate:1,
+            csvString:"${csvString}",
+            ${
+                form.email
+                    ? `
+                tableConfiguration:{
+                    filtersSet:{
+                    conjunction:and,
+                    filtersSet:[
+                        {
+                        field:"_apEMail_fldViznFWpT4RVJnZ",
+                        operator:"contains",
+                        value:["${form.email}"]
+                        }
+                    ]
+                    }
+                }
+            `
+                    : ""
+            }
+            )
+        }
+        `;
+
+        await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, mutationQuery);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+    await sendDataToBambooTable(form);
+    await sendMail(form);
 };
