@@ -104,7 +104,30 @@ const sendMail = async (form: { email: string; phone: string; [key: string]: any
     }
 };
 
-const sendDataToBambooTable = async (form: { email: string; phone: string; [key: string]: any }) => {
+const sendDataToBambooTable = async (initialForm: { email: string; phone: string; [key: string]: any }) => {
+    // Map form fields to bamboo fields
+    const form = {
+        _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
+        _status_fldxG5PdWUBHPf0RK: "Not contacted",
+        _firma_fldZjcqfv8yPKDyea: initialForm.name,
+        _apEMail_fldViznFWpT4RVJnZ: initialForm.email,
+        _apTelefon1_fldPOqfODf7TAodQV: initialForm.phone,
+        _website_fldfqTVDHqy6EcU5m: initialForm.website,
+        _campaignName: initialForm.campaignName,
+        _utmSource: initialForm.utmSource,
+        _utmMedium: initialForm.utmMedium,
+        _utmCampaign: initialForm.utmCampaign,
+        _keyword_fldwMVW1bGtuW7sqr: initialForm.utmTerm,
+        _anfrageAm_fldDW3dBF67bR7Bir: initialForm.date,
+        _versionCookie: initialForm.versionCookie,
+        _ipAddress: initialForm.ipAddress,
+        _xForwardedForIp: initialForm.xForwardedForIp,
+        _completeJson: initialForm.completeJson,
+        _url: initialForm.URL,
+        _userAgent: initialForm.userAgent,
+        _userAgentData: initialForm.userAgentData,
+    };
+
     try {
         const selectedFieldNames = Object.keys(form);
 
@@ -127,7 +150,7 @@ const sendDataToBambooTable = async (form: { email: string; phone: string; [key:
             numberOfRecordsToUpdate:1,
             csvString:"${csvString}",
             ${
-                form.email
+                initialForm.email
                     ? `
                 tableConfiguration:{
                     filtersSet:{
@@ -136,7 +159,7 @@ const sendDataToBambooTable = async (form: { email: string; phone: string; [key:
                         {
                         field:"_apEMail_fldViznFWpT4RVJnZ",
                         operator:"contains",
-                        value:["${form.email}"]
+                        value:["${initialForm.email}"]
                         }
                     ]
                     }
