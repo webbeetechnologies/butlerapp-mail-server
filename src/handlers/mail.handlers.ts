@@ -6,6 +6,7 @@ export const contactEmail = async (req: Request, res: Response): Promise<any> =>
     try {
         await sendContactMail({
             ...req.body,
+            name: req.body.name || req.body.email,
             ipAddress: req.ip,
             xForwardedForIp: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
         });

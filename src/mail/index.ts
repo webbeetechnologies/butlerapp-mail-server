@@ -109,7 +109,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
     const form = {
         _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
         _status_fldxG5PdWUBHPf0RK: "Not contacted",
-        _firma_fldZjcqfv8yPKDyea: initialForm.name || initialForm.email,
+        _firma_fldZjcqfv8yPKDyea: initialForm.name,
         _apEMail_fldViznFWpT4RVJnZ: initialForm.email,
         _apTelefon1_fldPOqfODf7TAodQV: initialForm.phone,
         _website_fldfqTVDHqy6EcU5m: initialForm.website,
