@@ -158,7 +158,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
                     filtersSet:[
                         {
                         field:"_apEMail_fldViznFWpT4RVJnZ",
-                        operator:"contains",
+                        operator:"=",
                         value:["${initialForm.email}"]
                         }
                     ]
