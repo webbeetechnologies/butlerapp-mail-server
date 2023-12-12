@@ -170,11 +170,11 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
             )
         }
         `;
-
+        console.debug("GraphQL Query:", mutationQuery);
         const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, mutationQuery);
-        console.log("GraphQL Response:", res);
+        console.debug("GraphQL Response:", res);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 };
 
