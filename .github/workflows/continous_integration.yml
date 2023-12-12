@@ -1,0 +1,51 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI - Main
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: bamboo
+    # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - name: Get Yarn cache path
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/checkout@v3
+      - name: Use Node.js 19.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 19.x
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        # install deps only if lockfile has changed
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+
+      - run: echo "REF_NAME=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - run: echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+      - run: echo "DEST_DIR=~/Development/butlerapp-mail-server/${{env.BRANCH_NAME}}" >> $GITHUB_ENV
+      - run: echo "CURR_DIR=${{env.DEST_DIR}}/${{env.REF_NAME}}" >> $GITHUB_ENV
+      - run: mkdir -p ${{env.CURR_DIR}}
+      - run: rsync -az --del ./ ${{env.CURR_DIR}}
+      - run: ln -s ${{env.DEST_DIR}}/.env ${{env.CURR_DIR}}/.env
+      - run: yarn --cwd ${{env.CURR_DIR}} build
+        # just keep the latest one
+      - run: ln -nsf ${{env.CURR_DIR}} ${{env.DEST_DIR}}/main
+      - run: cd ${{env.DEST_DIR}} && ls -lt | grep "^d" | awk "NR>1" | xargs rm -rf
