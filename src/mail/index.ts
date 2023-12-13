@@ -179,7 +179,8 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
 };
 
 export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
-    const findRecordQuery = `
+    try {
+        const findRecordQuery = `
     query{
         ${BAMBOO_TABLE_SLUG}(filtersSet: {conjunction: and, filtersSet: [{field: _apEMail_fldViznFWpT4RVJnZ, operator: "contains", value: ["${form.email}"]}]}){
          records{
@@ -191,9 +192,13 @@ export const sendContactMail = async (form: { email: string; phone: string; [key
       }
     `;
 
-    const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
-    const isExistingRecord = res[BAMBOO_TABLE_SLUG].records.result[0]?.id;
+        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
+        const isExistingRecord = res[BAMBOO_TABLE_SLUG].records.result[0]?.id;
 
-    await sendDataToBambooTable(form);
-    if (!isExistingRecord) await sendMail(form);
+        await sendDataToBambooTable(form);
+        if (!isExistingRecord) await sendMail(form);
+    } catch {
+        console.debug("Error sending request to bamboo: Sending to Mattermost");
+        await sendMail(form);
+    }
 };
