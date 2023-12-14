@@ -126,6 +126,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
         _url: initialForm.URL,
         _userAgent: initialForm.userAgent,
         _userAgentData: initialForm.userAgentData,
+        _country: initialForm.country,
     };
 
     try {
@@ -140,33 +141,29 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
             })
             .join("\t");
 
+        if (!initialForm.email) throw new Error("No email provided");
+
         // Send graphql to bamboo
         const mutationQuery = `
         mutation{
             csvImporter(
-            tableName:${BAMBOO_TABLE_SLUG},
-            selectedFieldNames:${JSON.stringify(selectedFieldNames)},
-            startRecordOffset:0,
-            numberOfRecordsToUpdate:1,
-            csvString:"${csvString}",
-            ${
-                initialForm.email
-                    ? `
-                tableConfiguration:{
+                tableName:${BAMBOO_TABLE_SLUG},
+                selectedFieldNames:${JSON.stringify(selectedFieldNames)},
+                startRecordOffset:0,
+                numberOfRecordsToUpdate:1,
+                csvString:"${csvString}",
+                tableConfiguration: {
                     filtersSet:{
-                    conjunction:and,
-                    filtersSet:[
-                        {
-                        field:"_apEMail_fldViznFWpT4RVJnZ",
-                        operator:"=",
-                        value:["${initialForm.email}"]
-                        }
-                    ]
+                        conjunction:and,
+                        filtersSet:[
+                            {
+                                field: "_apEMail_fldViznFWpT4RVJnZ",
+                                operator: "=",
+                                value:["${initialForm.email}"]
+                            }
+                        ]
                     }
                 }
-            `
-                    : ""
-            }
             )
         }
         `;
