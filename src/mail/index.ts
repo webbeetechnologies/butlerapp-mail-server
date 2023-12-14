@@ -19,6 +19,7 @@ import {
     MAIL_TO,
     MAIL_USER,
     MATTERMOST_MAIL_BOT_ACCESS_TOKEN,
+    QUIZ_NESTED_FORM_KEY,
 } from "@/utils/constants";
 
 import { normalizeString, stringifyForGraphQL } from "./utils";
@@ -109,10 +110,12 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
     const form = {
         _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
         _status_fldxG5PdWUBHPf0RK: "Not contacted",
-        _firma_fldZjcqfv8yPKDyea: initialForm.name,
-        _apEMail_fldViznFWpT4RVJnZ: initialForm.email,
-        _apTelefon1_fldPOqfODf7TAodQV: initialForm.phone,
-        _website_fldfqTVDHqy6EcU5m: initialForm.website,
+        _firma_fldZjcqfv8yPKDyea: initialForm.name || initialForm[QUIZ_NESTED_FORM_KEY]?.name,
+        _apEMail_fldViznFWpT4RVJnZ: initialForm.email || initialForm[QUIZ_NESTED_FORM_KEY]?.email,
+        _apTelefon1_fldPOqfODf7TAodQV: initialForm.phone || initialForm[QUIZ_NESTED_FORM_KEY]?.phone,
+        _website_fldfqTVDHqy6EcU5m: initialForm?.website,
+        _country: initialForm?.country || initialForm[QUIZ_NESTED_FORM_KEY]?.country,
+        _message: initialForm?.message,
         _campaignName: initialForm.campaignName,
         _utmSource: initialForm.utmSource,
         _utmMedium: initialForm.utmMedium,
@@ -126,7 +129,6 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
         _url: initialForm.URL,
         _userAgent: initialForm.userAgent,
         _userAgentData: initialForm.userAgentData,
-        _country: initialForm.country,
     };
 
     try {
@@ -141,7 +143,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
             })
             .join("\t");
 
-        if (!initialForm.email) throw new Error("No email provided");
+        if (!form._apEMail_fldViznFWpT4RVJnZ) throw new Error("No email provided");
 
         // Send graphql to bamboo
         const mutationQuery = `
