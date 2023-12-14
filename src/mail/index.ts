@@ -161,7 +161,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
                             {
                                 field: "_apEMail_fldViznFWpT4RVJnZ",
                                 operator: "=",
-                                value:["${initialForm.email}"]
+                                value:["${form._apEMail_fldViznFWpT4RVJnZ}"]
                             }
                         ]
                     }
