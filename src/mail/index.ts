@@ -40,6 +40,10 @@ const mailConfig = {
 
 export const transporter = nodemailer.createTransport(mailConfig);
 
+const isObject = (value: any) => {
+    return value && typeof value === "object" && value.constructor === Object;
+};
+
 // Read Email Template Files
 // const resetEmailTemplatePath = path.join(__dirname, "template-reset.html");
 //
@@ -138,7 +142,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
             .map((key) => {
                 const value = form[key as keyof typeof form];
                 if (typeof value === "string") return normalizeString(value);
-                if (value && typeof value === "object") return stringifyForGraphQL(value);
+                if (isObject(value)) return stringifyForGraphQL(value);
                 return value;
             })
             .join("\t");

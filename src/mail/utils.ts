@@ -1,7 +1,10 @@
 export const stringifyForGraphQL = (jsonObject: Record<string, any>) => {
     try {
         const jsonString = JSON.stringify(normalizeObjStringValues(jsonObject));
-        return jsonString.replace(/"/g, '\\"'); // Replace double quotes with escaped double quotes
+
+        // Replace double quotes with escaped double quotes, except the ones that are already escaped
+        return jsonString.replace(/(?<!\\)"/g, '\\"');
+        // return jsonString.replace(/"/g, '\\"');
     } catch (error) {
         console.error("Error stringifying JSON:", error);
         return "";
