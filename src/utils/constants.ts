@@ -22,3 +22,8 @@ export const BAMBOO_SERVER_HOST = process.env.BAMBOO_SERVER_HOST;
 export const BAMBOO_SERVER_APP_ID = process.env.BAMBOO_SERVER_APP_ID;
 export const BAMBOO_TABLE_SLUG = process.env.BAMBOO_TABLE_SLUG;
 export const QUIZ_NESTED_FORM_KEY = "Deine Demoversion steht bereit";
+
+// TWILIO
+export const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+export const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+export const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
