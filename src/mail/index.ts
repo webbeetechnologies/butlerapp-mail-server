@@ -10,6 +10,13 @@ import {
     BAMBOO_SERVER_APP_ID,
     BAMBOO_SERVER_HOST,
     BAMBOO_TABLE_SLUG,
+    BUTLERAPP_ACCOUNT_SETUP_URL,
+    BUTLERAPP_API_KEY,
+    DEMO_FROM_EMAIL,
+    DEMO_INSTALLER_API_KEY,
+    DEMO_INSTALLER_API_URL,
+    DEMO_INSTALLER_AUTHORITY,
+    DEMO_INSTALLER_SOURCE,
     // CLIENT_ADDRESS,
     MAIL_FROM,
     MAIL_HOST,
@@ -22,7 +29,7 @@ import {
     QUIZ_NESTED_FORM_KEY,
 } from "@/utils/constants";
 
-import { normalizeString, stringifyForGraphQL } from "./utils";
+import { generateUniqueString, normalizeString, stringifyForGraphQL } from "./utils";
 
 // import { resetMailText } from "./texts";
 
@@ -74,7 +81,7 @@ const isObject = (value: any) => {
 //     }
 // };
 
-const sendMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+const sendMail = async (form: { email: string; [key: string]: any }) => {
     try {
         const text = `
             Contact Info: 
@@ -105,11 +112,11 @@ const sendMail = async (form: { email: string; phone: string; [key: string]: any
             throw new Error("Something went wrong while sending the mail. Try again later.");
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 };
 
-const sendDataToBambooTable = async (initialForm: { email: string; phone: string; [key: string]: any }) => {
+const sendDataToBambooTable = async (initialForm: { email: string; [key: string]: any }) => {
     // Map form fields to bamboo fields
     const form = {
         _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
@@ -133,6 +140,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
         _url: initialForm.URL,
         _userAgent: initialForm.userAgent,
         _userAgentData: initialForm.userAgentData,
+        _demoUrl: initialForm?.demoURL,
     };
 
     try {
@@ -181,7 +189,7 @@ const sendDataToBambooTable = async (initialForm: { email: string; phone: string
     }
 };
 
-export const sendContactMail = async (form: { email: string; phone: string; [key: string]: any }) => {
+export const sendContactMail = async (form: { email: string; [key: string]: any }) => {
     try {
         const findRecordQuery = `
     query{
@@ -204,4 +212,144 @@ export const sendContactMail = async (form: { email: string; phone: string; [key
         console.debug("Error sending request to bamboo: Sending to Mattermost");
         await sendMail(form);
     }
+};
+
+export const setupUserAccount = async (form: { password: string; email: string; [key: string]: any }) => {
+    if (!form.email) throw new Error("No email provided");
+    if (!form.password) throw new Error("No password provided");
+    if (!form.phone) throw new Error("No phone provided");
+
+    const response = await axios.post(
+        BUTLERAPP_ACCOUNT_SETUP_URL,
+        {
+            email: form.email,
+            password: form.password,
+            phone: form.phone,
+            first_name: form?.name.split(" ")[0],
+            last_name: form?.name.split(" ")[1] || "",
+            mobile_phone: form.phone,
+            // Can we add website to the request?
+            // website: form.website,
+        },
+        {
+            headers: {
+                "X-Api-Key": BUTLERAPP_API_KEY,
+                Accept: "application/json",
+            },
+        }
+    );
+    console.debug("SETUP_USER", response);
+
+    return response;
+};
+
+const generateSubDomain = (website?: string) => {
+    if (!website) return generateUniqueString(10);
+    try {
+        // Ensure that the website is a valid URL by adding a protocol
+        const url = new URL(website.startsWith("http") ? website : `https://${website}`);
+        // Extract the hostname
+        const hostname = url.hostname;
+        // Split the hostname into parts
+        const hostnameParts = hostname.split(".");
+        // Remove the top level domain
+        hostnameParts.pop();
+        // Remove the www subdomain
+        if (hostnameParts[0] === "www") hostnameParts.shift();
+        const result = hostnameParts.join("-");
+
+        // add a prefix if it starts with a number
+        const startsWithNumber = /^\d/.test(result);
+        if (startsWithNumber) return `demo-${result}`;
+
+        return result;
+    } catch {
+        return generateUniqueString(10);
+    }
+};
+
+export const createDemoInstance = async (name: string) => {
+    if (!name) throw new Error("No name provided");
+
+    // Must be alphanumeric and should not contain any special characters, and must not start with a number
+    const nameRegex = /^[a-zA-Z][a-zA-Z0-9-]*$/;
+    if (!nameRegex.test(name)) throw new Error("Invalid name provided");
+
+    const response = await axios.post(
+        DEMO_INSTALLER_API_URL,
+        {
+            name,
+            source: DEMO_INSTALLER_SOURCE,
+        },
+        {
+            headers: {
+                "api-key": DEMO_INSTALLER_API_KEY,
+                authority: DEMO_INSTALLER_AUTHORITY,
+                "Content-Type": "application/json",
+                Accept: "*/*",
+            },
+        }
+    );
+    console.debug("CREATE_DEMO", response);
+
+    return response;
+};
+
+export const sendDemoMail = async (form: { password: string; email: string; [key: string]: any }) => {
+    const demoInstanceName = generateSubDomain(form.website);
+    // Run in parallel
+    await Promise.all([setupUserAccount(form), createDemoInstance(demoInstanceName)]);
+
+    const demoURL = `https://${demoInstanceName}.butlerapp2.de`;
+
+    // Send an email informing the user that the demo is ready
+    const htmlMessage = `
+        <p>Hi ${form.name},</p>
+        <p>Your demo is ready!</p>
+        <br/>
+        <p>Here are your login credentials:</p>
+        <p>Email: ${form.email}</p>
+        <p>Password: ${form.password}</p>
+        <br/>
+        <p>Click <a href="${demoURL}">here</a> to login to your demo instance.</p>
+        <br/>
+        <p>Or copy and paste this link into your browser: ${demoURL}</p>
+        <br/>
+        <p>Best regards,</p>
+        <p>Butlerapp</p>
+    `;
+
+    const textMessage = `
+        Hi ${form.name},
+        Your demo is ready!
+
+        Here are your login credentials:
+        Email: ${form.email}
+        Password: ${form.password}
+
+        Click here to login to your demo instance: ${demoURL}, or copy and paste this link into your browser: ${demoURL}
+
+        Best regards,
+        Butlerapp
+    `;
+
+    const mail = await transporter.sendMail({
+        from: DEMO_FROM_EMAIL || MAIL_USER,
+        to: form.email,
+        subject: "Your demo is ready! - Butlerapp",
+        text: textMessage,
+        html: htmlMessage,
+    });
+
+    if (!mail.accepted.length) {
+        throw new Error("Something went wrong while sending the mail. Try again later.");
+    }
+
+    // Send contact mail to bamboo
+    const bambooForm = {
+        ...form,
+        demoURL,
+    };
+
+    await sendContactMail(bambooForm);
 };
