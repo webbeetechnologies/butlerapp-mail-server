@@ -17,11 +17,11 @@ export const sendSMS = async (req: Request, res: Response): Promise<any> => {
             from: TWILIO_PHONE_NUMBER,
             to: req.body.to,
         });
-        console.log(response);
+        console.debug(response);
 
         return res.send({ message: "Success" });
     } catch (e) {
-        console.log(e);
+        console.error(e);
         return res.status(500).send();
     }
 };
