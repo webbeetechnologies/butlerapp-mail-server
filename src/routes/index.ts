@@ -9,7 +9,7 @@ const router = Router();
 
 // router.use("/auth", auth);
 // router.use("/users", user);
-router.use("/contact", mail);
+router.use("/", mail);
 router.use("/sms", sms);
 
 export default router;
