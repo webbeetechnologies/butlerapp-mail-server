@@ -141,7 +141,8 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
         _url: initialForm.URL,
         _userAgent: initialForm.userAgent,
         _userAgentData: initialForm.userAgentData,
-        _demoUrl: initialForm?.demoURL,
+        _timestampId: initialForm?.timestampId,
+        _demoAccess: initialForm?.demoURL,
     };
 
     try {
@@ -156,7 +157,7 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
             })
             .join("\t");
 
-        if (!form._apEMail_fldViznFWpT4RVJnZ) throw new Error("No email provided");
+        if (!form._timestampId) throw new Error("No timestampId provided");
 
         // Send graphql to bamboo
         const mutationQuery = `
@@ -172,9 +173,9 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
                         conjunction:and,
                         filtersSet:[
                             {
-                                field: "_apEMail_fldViznFWpT4RVJnZ",
+                                field: "_timestampId",
                                 operator: "=",
-                                value:["${form._apEMail_fldViznFWpT4RVJnZ}"]
+                                value:["${form._timestampId}"]
                             }
                         ]
                     }
@@ -194,7 +195,7 @@ export const sendContactMail = async (form: Record<string, any>) => {
     try {
         const findRecordQuery = `
     query{
-        ${BAMBOO_TABLE_SLUG}(filtersSet: {conjunction: and, filtersSet: [{field: _apEMail_fldViznFWpT4RVJnZ, operator: "contains", value: ["${form.email}"]}]}){
+        ${BAMBOO_TABLE_SLUG}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
          records{
           result{
             id
