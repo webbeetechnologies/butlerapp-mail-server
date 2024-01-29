@@ -319,25 +319,31 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
 
     // Send an email informing the user that the demo is ready
     const htmlMessage = `
-        <p>Hi ${form?.name},</p>
-        <p>Your demo is ready!</p>
-        <br/>
-        <p>Click <a href="${loginURL}">here</a> to login to your demo instance.</p>
-        <br/>
-        <p>Or copy and paste this link into your browser: ${loginURL}</p>
-        <br/>
-        <p>Best regards,</p>
-        <p>Butlerapp</p>
+        <p>Hallo ${form?.name},</p>
+        <p>Deine Demo ist ab jetzt für 30 Tage freigeschaltet.</p>
+        <p>Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden: <a href="${loginURL}">${loginURL}</a></p>
+        <p><strong>Falls du es noch nicht gemacht hast,</strong> empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.</p>
+        <p><a href="https://calendly.com/irina-butlerapp/60min?back=1&amp;month=2024-01">>&gt; Jetzt Termin auswählen</a></p>
+        <p>Ich freue mich schon auf unseren Termin und bis dann 😊</p>
+        <p>P.S. <br/>
+        Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten 😊.</p>      
     `;
 
     const textMessage = `
-        Hi ${form.name},
-        Your demo is ready!
-        \n\n
-        Click here to login to your demo instance: ${loginURL}, or copy and paste this link into your browser: ${loginURL}
-        \n\n
-        Best regards,
-        Butlerapp
+        Hallo ${form?.name},
+
+        Deine Demo ist ab jetzt für 30 Tage freigeschaltet.
+
+        Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden: ${loginURL}
+
+        Falls du es noch nicht gemacht hast, empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.
+
+        >> Jetzt Termin auswählen (https://calendly.com/irina-butlerapp/60min?back=1&month=2024-01)
+
+        Ich freue mich schon auf unseren Termin und bis dann 😊
+
+        P.S.
+        Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten 😊.
     `;
 
     console.debug("DEMO_MAIL", textMessage);
