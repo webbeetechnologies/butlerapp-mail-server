@@ -76,9 +76,7 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
     const response = new VoiceResponse();
     const gather = response.gather({
         numDigits: 1,
-        action: `https://60a0-169-150-218-134.ngrok-free.app/api/sms/repeatOTP?body=${encodeURIComponent(
-            body
-        )}`,
+        action: `/api/sms/repeatOTP?body=${encodeURIComponent(body)}`,
         method: "POST",
         language: "de-DE",
     });
