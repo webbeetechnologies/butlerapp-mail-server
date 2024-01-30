@@ -79,6 +79,7 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
         action: `https://www.butlerapp.de/api/sms/repeatOTP?body=${encodeURIComponent(body)}`,
         method: "POST",
         language: "de-DE",
+        timeout: 10,
     });
 
     console.debug("body", body);
@@ -93,6 +94,9 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
     });
 
     gather.say({ language: "de-DE" }, "Um die Nachricht zu wiederholen, drücke eins");
+
+    // If the user does not provide input, the following TwiML will be executed after the timeout
+    response.say({ language: "de-DE" }, "Vielen Dank für deinen Anruf. Bis bald!");
 
     return response.toString();
 };
