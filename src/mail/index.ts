@@ -351,7 +351,7 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     const mail = await transporter.sendMail({
         from: DEMO_FROM_EMAIL || MAIL_USER,
         to: form.email,
-        subject: "Your demo is ready! - Butlerapp",
+        subject: "Deine Demo wartet auf dich! — Butlerapp",
         text: textMessage,
         html: htmlMessage,
     });
