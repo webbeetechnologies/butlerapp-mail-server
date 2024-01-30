@@ -92,5 +92,8 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
 
     gather.say({ language: "de-DE" }, "Um die Nachricht zu wiederholen, drücke eins");
 
+    // Wait 30 seconds for user input, otherwise hang up
+    response.pause({ length: 30 });
+
     return response.toString();
 };
