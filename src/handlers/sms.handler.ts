@@ -76,10 +76,12 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
     const response = new VoiceResponse();
     const gather = response.gather({
         numDigits: 1,
-        action: `/api/sms/repeatOTP?body=${encodeURIComponent(body)}`,
+        action: `https://www.butlerapp.de/api/sms/repeatOTP?body=${encodeURIComponent(body)}`,
         method: "POST",
         language: "de-DE",
     });
+
+    console.debug("body", body);
 
     gather.say({ language: "de-DE" }, "Dein Bestätigungscode lautet");
     gather.pause({ length: 1 });
@@ -91,9 +93,6 @@ const createOTPTwiML = ({ body }: { body: string }): string => {
     });
 
     gather.say({ language: "de-DE" }, "Um die Nachricht zu wiederholen, drücke eins");
-
-    // Wait 30 seconds for user input, otherwise hang up
-    response.pause({ length: 30 });
 
     return response.toString();
 };
