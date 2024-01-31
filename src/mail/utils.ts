@@ -24,7 +24,7 @@ export const normalizeObjStringValues = (obj: Record<string, any>) => {
 };
 
 export const generateUniqueString = (length: number) => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const chars = "abcdefghijklmnopqrstuvwxyz";
     let result = "";
     for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
