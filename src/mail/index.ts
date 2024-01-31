@@ -315,35 +315,63 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     // Setup user account
     const response = await setupUserAccount(form);
 
+    // Delete password from form
+    delete form.password;
+
     const loginURL = response.data.body.redirect.body;
 
     // Send an email informing the user that the demo is ready
     const htmlMessage = `
-        <p>Hallo ${form?.name},</p>
-        <p>Deine Demo ist ab jetzt für 30 Tage freigeschaltet.</p>
-        <p>Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden: <a href="${loginURL}">${loginURL}</a></p>
-        <p><strong>Falls du es noch nicht gemacht hast,</strong> empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.</p>
-        <p><a href="https://calendly.com/irina-butlerapp/60min?back=1&amp;month=2024-01">>&gt; Jetzt Termin auswählen</a></p>
-        <p>Ich freue mich schon auf unseren Termin und bis dann 😊</p>
-        <p>P.S. <br/>
-        Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten 😊.</p>      
+    <span style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;">Hallo X,</span><div style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div><br>
+    </div><div>Deine Demoversion ist jetzt für <b>30 Tage</b> freigeschaltet. <br>
+    </div><div><br>
+    </div><div><div>Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden:</div><div><br>
+    </div><div><font size="4"><a href="${loginURL}" target="_blank" style="color: rgb(17, 85, 204);">» Demo</a></font></div><div><br>
+    </div><div>Unser Handbuch zur Software findest du unter folgendem Link:</div><div><br>
+    </div><div><font size="4"><a href="https://intercom.help/butler/de/collections/3160101-butler-knowledgebase" target="_blank" style="color: rgb(17, 85, 204);">» Handbuch</a></font></div><div><br>
+    </div><div><b>Falls du es noch nicht gemacht hast,</b> empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.</div><div><br>
+    </div><div><font size="4"><a href="https://calendly.com/irina-butlerapp/60min?back=1&amp;month=2024-01" target="_blank" style="color: rgb(17, 85, 204);">» Jetzt Termin auswählen</a></font></div><div><br>
+    </div><div>Ich freue mich schon auf unseren Termin und bis dann <img data-emoji="😊" class="an1" alt="😊" aria-label="😊" src="https://fonts.gstatic.com/s/e/notoemoji/15.0/1f60a/72.png" loading="lazy" style="height: 1.2em; width: 1.2em; vertical-align: middle;"></div><div><br>
+    </div><div>P.S. </div><div>Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten <img data-emoji="😊" class="an1" alt="😊" aria-label="😊" src="https://fonts.gstatic.com/s/e/notoemoji/15.0/1f60a/72.png" loading="lazy" style="height: 1.2em; width: 1.2em; vertical-align: middle;">.</div></div></div><div style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><br>
+    </div><span class="gmail_signature_prefix" style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;">--</span><br style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;"><br>
+    </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;">Tobias Anhalt<br>
+    </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;"><br>
+    </div><div><font color="#262626" face="-apple-system, system-ui, sans-serif"><span style="font-size: 14px;">Tel: </span></font>+49 30 31199677</div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Mail: <a href="mailto:tobias@butlerapp.de" target="_blank" style="color: rgb(17, 85, 204);">tobias@butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Web: <a href="https://www.butlerapp.de/" target="_blank" style="color: rgb(17, 85, 204);">www.butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"><br>
+    </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"><div>Webbee GmbH</div><div>Oberwallstraße 6</div><div>10117 Berlin</div><div>Geschäftsführer: Tobias Anhalt</div><div>Amtsgericht Charlottenburg | HRB 192759</div></div></div></div></div></div></div></div></div></div></div>     
     `;
 
     const textMessage = `
-        Hallo ${form?.name},
-
-        Deine Demo ist ab jetzt für 30 Tage freigeschaltet.
-
-        Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden: ${loginURL}
-
-        Falls du es noch nicht gemacht hast, empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.
-
-        >> Jetzt Termin auswählen (https://calendly.com/irina-butlerapp/60min?back=1&month=2024-01)
-
-        Ich freue mich schon auf unseren Termin und bis dann 😊
-
-        P.S.
-        Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten 😊.
+    Hallo ${form?.name},
+    \n\n
+    Deine Demoversion ist jetzt für 30 Tage freigeschaltet. 
+    \n\n
+    Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden:\n
+    ${loginURL}
+    \n\n
+    Unser Handbuch zur Software findest du unter folgendem Link:\n
+    https://intercom.help/butler/de/collections/3160101-butler-knowledgebase
+    \n\n
+    Falls du es noch nicht gemacht hast, empfehle ich dir in meinem Kalender einen Termin auszuwählen, wo ich dir eine auf dich zugeschnittene Demo von Butlerapp zeige. So findest du in unter 30 Minuten heraus ob Butlerapp für dich passt oder eben halt nicht.\n
+    https://calendly.com/irina-butlerapp/60min?back=1&amp;month=2024-01
+    \n\n
+    Ich freue mich schon auf unseren Termin und bis dann 😊
+    \n\n
+    P.S.\n
+    Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten 😊.
+    \n\n
+    --
+    \n\n
+    Tobias Anhalt
+    \n\n
+    Tel:  +49 30 31199677\n
+    Mail: tobias@butlerapp.de\n
+    Web: www.butlerapp.de\n
+    \n\n
+    Webbee GmbH\n
+    Oberwallstraße 6\n
+    10117 Berlin\n
+    Geschäftsführer: Tobias Anhalt\n
+    Amtsgericht Charlottenburg | HRB 192759\n
     `;
 
     console.debug("DEMO_MAIL", textMessage);
