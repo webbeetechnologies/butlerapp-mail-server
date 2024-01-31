@@ -312,9 +312,9 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
         await createDemoInstance(demoInstanceName);
         // Wait for the demo instance to be created, otherwise the account setup will fail
 
-        // Wait for 10 seconds
-        console.debug("Waiting for Demo Instance to be created: 20s");
-        await new Promise((resolve) => setTimeout(resolve, 20000));
+        // Wait for 60 seconds
+        console.debug("Waiting for Demo Instance to be created: 60s");
+        await new Promise((resolve) => setTimeout(resolve, 60000));
         console.debug("Demo Instance created! Setting up user account");
     }
 
