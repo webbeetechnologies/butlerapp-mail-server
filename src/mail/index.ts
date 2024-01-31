@@ -296,7 +296,7 @@ export const createDemoInstance = async (name: string) => {
 };
 
 export const sendDemoMail = async (initialForm: { password: string; email: string; [key: string]: any }) => {
-    const isDev = ENVIRONMENT === "development" || initialForm?.phone === "495678";
+    const isDev = ENVIRONMENT === "development" || initialForm?.phone === "495679";
     const demoInstanceName = isDev ? "tobiasisthegreatest2" : generateSubDomain(initialForm.website);
 
     const demoURL = `https://${demoInstanceName}.butlerapp2.de`;
