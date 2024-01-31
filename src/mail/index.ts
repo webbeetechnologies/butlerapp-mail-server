@@ -297,7 +297,7 @@ export const createDemoInstance = async (name: string) => {
 
 export const sendDemoMail = async (initialForm: { password: string; email: string; [key: string]: any }) => {
     const isDev = ENVIRONMENT === "development" || initialForm?.phone === "495678";
-    const demoInstanceName = isDev ? "tobiasisthegreatest2" : generateSubDomain(initialForm.website);
+    const demoInstanceName = !isDev ? "tobiasisthegreatest2" : generateSubDomain(initialForm.website);
 
     const demoURL = `https://${demoInstanceName}.butlerapp2.de`;
     const form: Record<string, any> = {
@@ -310,6 +310,12 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     // For testing purposes, we don't need to create a demo instance
     if (!isDev) {
         await createDemoInstance(demoInstanceName);
+        // Wait for the demo instance to be created, otherwise the account setup will fail
+
+        // Wait for 10 seconds
+        console.debug("Waiting for Demo Instance to be created: 20s");
+        await new Promise((resolve) => setTimeout(resolve, 20000));
+        console.debug("Demo Instance created! Setting up user account");
     }
 
     // Setup user account
