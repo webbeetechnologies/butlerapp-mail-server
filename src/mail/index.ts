@@ -12,6 +12,7 @@ import {
     BAMBOO_TABLE_SLUG,
     BUTLERAPP_ACCOUNT_SETUP_ENDPOINT,
     BUTLERAPP_API_KEY,
+    DEMO_BCC_EMAIL,
     DEMO_FROM_EMAIL,
     DEMO_INSTALLER_API_KEY,
     DEMO_INSTALLER_API_URL,
@@ -385,6 +386,7 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     const mail = await transporter.sendMail({
         from: DEMO_FROM_EMAIL || MAIL_USER,
         to: form.email,
+        bcc: DEMO_BCC_EMAIL,
         subject: "Deine Demo wartet auf dich! — Butlerapp",
         text: textMessage,
         html: htmlMessage,

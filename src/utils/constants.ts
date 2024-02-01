@@ -37,3 +37,4 @@ export const DEMO_INSTALLER_SOURCE = process.env.DEMO_INSTALLER_SOURCE;
 export const BUTLERAPP_ACCOUNT_SETUP_ENDPOINT = process.env.BUTLERAPP_ACCOUNT_SETUP_ENDPOINT;
 export const BUTLERAPP_API_KEY = process.env.BUTLERAPP_API_KEY;
 export const DEMO_FROM_EMAIL = process.env.DEMO_FROM_EMAIL;
+export const DEMO_BCC_EMAIL = process.env.DEMO_BCC_EMAIL;
