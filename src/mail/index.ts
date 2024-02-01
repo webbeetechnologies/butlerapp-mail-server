@@ -328,7 +328,7 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
 
     // Send an email informing the user that the demo is ready
     const htmlMessage = `
-    <span style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;">Hallo X,</span><div style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div><br>
+    <span style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;">Hallo ${form?.name},</span><div style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div><br>
     </div><div>Deine Demoversion ist jetzt für <b>30 Tage</b> freigeschaltet. <br>
     </div><div><br>
     </div><div><div>Du kannst dich in deine Butlerapp Demoversion unter folgendem Link anmelden:</div><div><br>
