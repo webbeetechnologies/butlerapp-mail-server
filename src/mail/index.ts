@@ -146,6 +146,10 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
         _demoAccess: initialForm?.demoURL,
     };
 
+    // remove undefined keys from the object
+    Object.keys(form).forEach((key) => form[key] === undefined && delete form[key]);
+    console.debug("SENDING FORM DATA", form);
+
     try {
         const selectedFieldNames = Object.keys(form);
 
