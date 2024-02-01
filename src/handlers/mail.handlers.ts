@@ -30,6 +30,6 @@ export const issueDemo = async (req: Request, res: Response): Promise<any> => {
         return res.send({ message: "Success" });
     } catch (e) {
         console.error(e);
-        return res.status(500).send();
+        return res.status(500).send(e?.message);
     }
 };
