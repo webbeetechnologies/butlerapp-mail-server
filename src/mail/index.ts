@@ -345,9 +345,9 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     </div><div>Ich freue mich schon auf unseren Termin und bis dann <img data-emoji="😊" class="an1" alt="😊" aria-label="😊" src="https://fonts.gstatic.com/s/e/notoemoji/15.0/1f60a/72.png" loading="lazy" style="height: 1.2em; width: 1.2em; vertical-align: middle;"></div><div><br>
     </div><div>P.S. </div><div>Dies ist eine automatisch generierte Mail, aber du kannst mir bei Fragen gerne antworten <img data-emoji="😊" class="an1" alt="😊" aria-label="😊" src="https://fonts.gstatic.com/s/e/notoemoji/15.0/1f60a/72.png" loading="lazy" style="height: 1.2em; width: 1.2em; vertical-align: middle;">.</div></div></div><div style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><br>
     </div><span class="gmail_signature_prefix" style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;">--</span><br style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" style="color: rgb(34, 34, 34); font-family: Arial, Helvetica, sans-serif; font-size: small;"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;"><br>
-    </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;">Tobias Anhalt<br>
+    </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;">Irina Varapai<br>
     </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px; font-weight: bold;"><br>
-    </div><div><font color="#262626" face="-apple-system, system-ui, sans-serif"><span style="font-size: 14px;">Tel: </span></font>+49 30 31199677</div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Mail: <a href="mailto:tobias@butlerapp.de" target="_blank" style="color: rgb(17, 85, 204);">tobias@butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Web: <a href="https://www.butlerapp.de/" target="_blank" style="color: rgb(17, 85, 204);">www.butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"><br>
+    </div><div><font color="#262626" face="-apple-system, system-ui, sans-serif"><span style="font-size: 14px;">Tel: </span></font>+49 30 311 994 25</div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Mail: <a href="mailto:irina@butlerapp.de" target="_blank" style="color: rgb(17, 85, 204);">irina@butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;">Web: <a href="https://www.butlerapp.de/" target="_blank" style="color: rgb(17, 85, 204);">www.butlerapp.de</a></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"></div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"><br>
     </div><div style="color: rgb(38, 38, 38); font-family: -apple-system, system-ui, sans-serif; font-size: 14px;"><div>Webbee GmbH</div><div>Oberwallstraße 6</div><div>10117 Berlin</div><div>Geschäftsführer: Tobias Anhalt</div><div>Amtsgericht Charlottenburg | HRB 192759</div></div></div></div></div></div></div></div></div></div></div>     
     `;
 
@@ -372,10 +372,10 @@ export const sendDemoMail = async (initialForm: { password: string; email: strin
     \n\n
     --
     \n\n
-    Tobias Anhalt
+    Irina Varapai
     \n\n
-    Tel:  +49 30 31199677\n
-    Mail: tobias@butlerapp.de\n
+    Tel: +49 30 311 994 25\n
+    Mail: irina@butlerapp.de\n
     Web: www.butlerapp.de\n
     \n\n
     Webbee GmbH\n
