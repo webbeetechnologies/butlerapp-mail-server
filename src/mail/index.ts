@@ -12,6 +12,7 @@ import {
     BAMBOO_TABLE_SLUG,
     BUTLERAPP_ACCOUNT_SETUP_ENDPOINT,
     BUTLERAPP_API_KEY,
+    DEMO_BCC_EMAIL,
     DEMO_FROM_EMAIL,
     DEMO_INSTALLER_API_KEY,
     DEMO_INSTALLER_API_URL,
@@ -144,6 +145,10 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
         _timestampId: initialForm?.timestampId,
         _demoAccess: initialForm?.demoURL,
     };
+
+    // remove undefined keys from the object
+    Object.keys(form).forEach((key) => form[key] === undefined && delete form[key]);
+    console.debug("SENDING FORM DATA", form);
 
     try {
         const selectedFieldNames = Object.keys(form);
