@@ -12,7 +12,7 @@ import {
     BAMBOO_TABLE_SLUG,
     BUTLERAPP_ACCOUNT_SETUP_ENDPOINT,
     BUTLERAPP_API_KEY,
-    DEMO_BCC_EMAIL,
+    COURSE_CONFIGURATOR_TABLE_SLUG,
     DEMO_FROM_EMAIL,
     DEMO_INSTALLER_API_KEY,
     DEMO_INSTALLER_API_URL,
@@ -118,33 +118,50 @@ const sendMail = async (form: Record<string, any>) => {
     }
 };
 
-const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
+const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
     // Map form fields to bamboo fields
-    const form = {
-        _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
-        _status_fldxG5PdWUBHPf0RK: "Not contacted",
-        _firma_fldZjcqfv8yPKDyea: initialForm?.name || initialForm[QUIZ_NESTED_FORM_KEY]?.name,
-        _apEMail_fldViznFWpT4RVJnZ: initialForm?.email || initialForm[QUIZ_NESTED_FORM_KEY]?.email,
-        _apTelefon1_fldPOqfODf7TAodQV: initialForm?.phone || initialForm[QUIZ_NESTED_FORM_KEY]?.phone,
-        _website_fldfqTVDHqy6EcU5m: initialForm?.website,
-        _country: initialForm?.country || initialForm[QUIZ_NESTED_FORM_KEY]?.country,
-        _message: initialForm?.message,
-        _campaignName: initialForm.campaignName,
-        _utmSource: initialForm.utmSource,
-        _utmMedium: initialForm.utmMedium,
-        _utmCampaign: initialForm.utmCampaign,
-        _keyword_fldwMVW1bGtuW7sqr: initialForm.utmTerm,
-        _anfrageAm_fldDW3dBF67bR7Bir: initialForm.date,
-        _versionCookie: initialForm.versionCookie,
-        _ipAddress: initialForm.ipAddress,
-        _xForwardedForIp: initialForm.xForwardedForIp,
-        _completeJson: initialForm.completeJson,
-        _url: initialForm.URL,
-        _userAgent: initialForm.userAgent,
-        _userAgentData: initialForm.userAgentData,
-        _timestampId: initialForm?.timestampId,
-        _demoAccess: initialForm?.demoURL,
-    };
+    const form =
+        tableSlug === COURSE_CONFIGURATOR_TABLE_SLUG
+            ? {
+                  // Course configurator specific fields
+                  _eventType: initialForm?.eventType,
+                  _eventDate: initialForm?.eventDate,
+                  _hasStartTimes: initialForm?.hasStartTimes,
+                  _eventName: initialForm?.eventName,
+                  _eventTime: initialForm?.eventTime,
+                  _costType: initialForm?.costType,
+                  _paymentMethods: initialForm?.paymentMethods,
+                  _automationTypes: initialForm?.automationTypes,
+                  _website: initialForm?.website,
+                  _hasNoWebsite: initialForm?.hasNoWebsite,
+                  _timestampId: initialForm?.timestampId,
+              }
+            : {
+                  _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
+                  _status_fldxG5PdWUBHPf0RK: "Not contacted",
+                  _firma_fldZjcqfv8yPKDyea: initialForm?.name || initialForm[QUIZ_NESTED_FORM_KEY]?.name,
+                  _apEMail_fldViznFWpT4RVJnZ: initialForm?.email || initialForm[QUIZ_NESTED_FORM_KEY]?.email,
+                  _apTelefon1_fldPOqfODf7TAodQV:
+                      initialForm?.phone || initialForm[QUIZ_NESTED_FORM_KEY]?.phone,
+                  _website_fldfqTVDHqy6EcU5m: initialForm?.website,
+                  _country: initialForm?.country || initialForm[QUIZ_NESTED_FORM_KEY]?.country,
+                  _message: initialForm?.message,
+                  _campaignName: initialForm.campaignName,
+                  _utmSource: initialForm.utmSource,
+                  _utmMedium: initialForm.utmMedium,
+                  _utmCampaign: initialForm.utmCampaign,
+                  _keyword_fldwMVW1bGtuW7sqr: initialForm.utmTerm,
+                  _anfrageAm_fldDW3dBF67bR7Bir: initialForm.date,
+                  _versionCookie: initialForm.versionCookie,
+                  _ipAddress: initialForm.ipAddress,
+                  _xForwardedForIp: initialForm.xForwardedForIp,
+                  _completeJson: initialForm.completeJson,
+                  _url: initialForm.URL,
+                  _userAgent: initialForm.userAgent,
+                  _userAgentData: initialForm.userAgentData,
+                  _timestampId: initialForm?.timestampId,
+                  _demoAccess: initialForm?.demoURL,
+              };
 
     // remove undefined keys from the object
     Object.keys(form).forEach((key) => form[key] === undefined && delete form[key]);
@@ -168,7 +185,7 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
         const mutationQuery = `
         mutation{
             csvImporter(
-                tableName:${BAMBOO_TABLE_SLUG},
+                tableName:${tableSlug},
                 selectedFieldNames:${JSON.stringify(selectedFieldNames)},
                 startRecordOffset:0,
                 numberOfRecordsToUpdate:1,
@@ -197,10 +214,11 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>) => {
 };
 
 export const sendContactMail = async (form: Record<string, any>) => {
+    const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
     try {
         const findRecordQuery = `
     query{
-        ${BAMBOO_TABLE_SLUG}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
+        ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
          records{
           result{
             id
@@ -211,13 +229,13 @@ export const sendContactMail = async (form: Record<string, any>) => {
     `;
 
         const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
-        const isExistingRecord = res[BAMBOO_TABLE_SLUG].records.result[0]?.id;
+        const isExistingRecord = res[tableSlug].records.result[0]?.id;
 
-        await sendDataToBambooTable(form);
+        await sendDataToBambooTable(form, tableSlug);
         if (!isExistingRecord) await sendMail(form);
     } catch {
         console.debug("Error sending request to bamboo: Sending to Mattermost");
-        await sendMail(form);
+        // await sendMail(form);
     }
 };
 
