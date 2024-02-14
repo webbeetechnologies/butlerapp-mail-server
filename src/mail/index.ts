@@ -235,7 +235,7 @@ export const sendContactMail = async (form: Record<string, any>) => {
         if (!isExistingRecord) await sendMail(form);
     } catch {
         console.debug("Error sending request to bamboo: Sending to Mattermost");
-        // await sendMail(form);
+        await sendMail(form);
     }
 };
 
