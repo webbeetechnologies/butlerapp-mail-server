@@ -55,10 +55,7 @@ export const confirmOTP = (req: Request, res: Response) => {
         if (input.length === 1 && input === "1") {
             console.debug("User pressed 1, redirecting to conference call");
             const response = new VoiceResponse();
-            response.redirect(
-                { method: "POST" },
-                "https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/conference"
-            );
+            response.redirect({ method: "POST" }, "https://www.butlerapp.de/api/sms-dev/conference");
             res.type("text/xml");
             res.send(response.toString());
             return;
@@ -76,7 +73,7 @@ export const confirmOTP = (req: Request, res: Response) => {
             const twiml = new VoiceResponse();
             twiml.redirect(
                 { method: "POST" },
-                "https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/afterOTP?isCorrect=true"
+                "https://www.butlerapp.de/api/sms-dev/afterOTP?isCorrect=true"
             );
 
             res.type("text/xml");
@@ -95,9 +92,7 @@ const createOTPTwiML = ({ otp, isFailed }: { otp: string; isFailed?: boolean }):
 
     const gather = response.gather({
         numDigits: 4,
-        action: `https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/confirmOTP?otp=${encodeURIComponent(
-            otp
-        )}`,
+        action: `https://www.butlerapp.de/api/sms-dev/confirmOTP?otp=${encodeURIComponent(otp)}`,
         method: "POST",
         language: "de-DE",
         timeout: 10,
@@ -120,7 +115,7 @@ const createOTPTwiML = ({ otp, isFailed }: { otp: string; isFailed?: boolean }):
 
     // If the user does not provide input, ask for a conference call
     console.debug("Redirecting to afterOTP if user does not enter any input");
-    response.redirect({ method: "POST" }, "https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/afterOTP");
+    response.redirect({ method: "POST" }, "https://www.butlerapp.de/api/sms-dev/afterOTP");
 
     return response.toString();
 };
@@ -148,7 +143,7 @@ export const handleAfterOTP = (req: Request, res: Response) => {
 
         const gather = response.gather({
             numDigits: 1,
-            action: "https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/conference",
+            action: "https://www.butlerapp.de/api/sms-dev/conference",
             method: "POST",
             language: "de-DE",
             timeout: 10,
@@ -194,7 +189,7 @@ export const handleConferenceCall = (req: Request, res: Response) => {
             const response = new VoiceResponse();
             response.redirect(
                 { method: "POST" },
-                "https://b9c6-37-45-237-166.ngrok-free.app/api/sms-dev/afterOTP?isCorrect=false"
+                "https://www.butlerapp.de/api/sms-dev/afterOTP?isCorrect=false"
             );
 
             // Send event to connected clients
