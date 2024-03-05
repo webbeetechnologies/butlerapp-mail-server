@@ -28,6 +28,8 @@ export const QUIZ_NESTED_FORM_KEY = "Deine Demoversion steht bereit";
 export const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
 export const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 export const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
+export const TWILIO_FROM_NUMBER = process.env.TWILIO_FROM_NUMBER;
+export const CUSTOMER_REP_NUMBER = process.env.CUSTOMER_REP_NUMBER;
 
 // DEMO Installation
 export const DEMO_INSTALLER_API_URL = process.env.DEMO_INSTALLER_API_URL;
