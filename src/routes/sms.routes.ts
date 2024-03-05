@@ -1,7 +1,7 @@
 import { Router } from "express";
 import asyncHandler from "express-async-handler";
 
-import { confirmOTP, handleAfterOTP, handleConferenceCall, sendSMS } from "@/handlers/sms.handler";
+import { repeatOTP, sendSMS } from "@/handlers/sms.handler";
 
 const router = Router();
 
@@ -11,10 +11,6 @@ const router = Router();
  */
 router.post("/", asyncHandler(sendSMS));
 
-router.post("/confirmOTP", asyncHandler(confirmOTP));
-
-router.post("/afterOTP", asyncHandler(handleAfterOTP));
-
-router.post("/conference", asyncHandler(handleConferenceCall));
+router.post("/repeatOTP", asyncHandler(repeatOTP));
 
 export default router;
