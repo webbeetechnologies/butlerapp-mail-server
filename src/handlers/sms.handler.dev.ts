@@ -91,7 +91,6 @@ const createOTPTwiML = ({ otp, isFailed }: { otp: string; isFailed?: boolean }):
     const response = new VoiceResponse();
 
     const gather = response.gather({
-        numDigits: 4,
         action: `https://www.butlerapp.de/api/sms-dev/confirmOTP?otp=${encodeURIComponent(otp)}`,
         method: "POST",
         language: "de-DE",
@@ -177,7 +176,7 @@ export const handleConferenceCall = (req: Request, res: Response) => {
                 {
                     callerId: TWILIO_FROM_NUMBER,
                 },
-                "+4915792349085"
+                CUSTOMER_REP_NUMBER
             );
 
             // Send event to connected clients
