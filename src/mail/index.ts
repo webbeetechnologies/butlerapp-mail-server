@@ -214,7 +214,8 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
 };
 
 export const sendContactMail = async (form: Record<string, any>) => {
-    const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
+    // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
+    const tableSlug = BAMBOO_TABLE_SLUG;
     try {
         const findRecordQuery = `
     query{
