@@ -282,13 +282,17 @@ const generateSubDomain = (website?: string) => {
         hostnameParts.pop();
         // Remove the www subdomain
         if (hostnameParts[0] === "www") hostnameParts.shift();
-        const result = hostnameParts.join("-");
+        const result = hostnameParts.join("");
 
         // add a prefix if it starts with a number
         const startsWithNumber = /^\d/.test(result);
-        if (startsWithNumber) return `demo-${result}`;
+        if (startsWithNumber) return `demo${result}`;
 
-        return result;
+        // escape special characters like hyphens
+        const escapedResult = result.replace(/[^a-zA-Z0-9-]/g, "").replace(/-/g, "");
+
+        if (escapedResult.length < 3) return generateUniqueString(10);
+        return escapedResult;
     } catch {
         return generateUniqueString(10);
     }
