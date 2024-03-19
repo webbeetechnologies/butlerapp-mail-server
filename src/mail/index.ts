@@ -135,6 +135,7 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
                   _website: initialForm?.website,
                   _hasNoWebsite: initialForm?.hasNoWebsite,
                   _timestampId: initialForm?.timestampId,
+                  _screenResolution: initialForm?.screenResolution,
               }
             : {
                   _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
@@ -161,6 +162,7 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
                   _userAgentData: initialForm.userAgentData,
                   _timestampId: initialForm?.timestampId,
                   _demoAccess: initialForm?.demoURL,
+                  _screenResolution: initialForm?.screenResolution,
               };
 
     // remove undefined keys from the object
