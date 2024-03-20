@@ -119,7 +119,7 @@ const sendMail = async (form: Record<string, any>) => {
 };
 
 const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
-    console.log("START: SENDING DATA TO BAMBOO TABLE", initialForm, tableSlug);
+    console.debug("START: SENDING DATA TO BAMBOO TABLE", initialForm, tableSlug);
     // Map form fields to bamboo fields
     const form =
         tableSlug === COURSE_CONFIGURATOR_TABLE_SLUG
