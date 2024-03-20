@@ -231,6 +231,8 @@ export const sendContactMail = async (form: Record<string, any>) => {
       }
     `;
 
+        console.debug("FINDING RECORD", findRecordQuery, tableSlug);
+
         const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
         const isExistingRecord = res[tableSlug].records.result[0]?.id;
 
