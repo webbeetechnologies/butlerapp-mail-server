@@ -3,6 +3,7 @@
 import axios, { AxiosResponse } from "axios";
 import nodemailer from "nodemailer";
 const MATTERMOST_INBOUNDS_CHANNEL_ID = "pp9amtzhebdy8bi7ikz6m3jjgw";
+const MATTERMOST_LEADS_CHANNEL_ID = "krr34khcafn75qffyfkxod9epa";
 
 import request from "graphql-request";
 
@@ -34,6 +35,11 @@ import {
 import { generateUniqueString, normalizeString, stringifyForGraphQL } from "./utils";
 
 // import { resetMailText } from "./texts";
+
+type MattermostPost = {
+    id: string;
+    [key: string]: any;
+};
 
 const mailConfig = {
     host: MAIL_HOST,
@@ -116,6 +122,65 @@ const sendMail = async (form: Record<string, any>) => {
     } catch (error) {
         console.error(error);
     }
+};
+
+const sendMessageToLeadsChannel = async (form: Record<string, any>) => {
+    try {
+        const text = Object.entries(form)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join("\n");
+
+        const res = await axios.post<MattermostPost>(
+            "https://mattermost.bambooapp.ai/api/v4/posts",
+            {
+                channel_id: MATTERMOST_LEADS_CHANNEL_ID,
+                message: text,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MATTERMOST_MAIL_BOT_ACCESS_TOKEN}`,
+                },
+            }
+        );
+
+        return res.data.id;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
+    const { postId, ...formData } = form;
+    try {
+        const text = Object.entries(formData)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join("\n");
+
+        const res = await axios.put<MattermostPost>(
+            `https://mattermost.bambooapp.ai/api/v4/posts/${form.postId}`,
+            {
+                id: postId,
+                message: text,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MATTERMOST_MAIL_BOT_ACCESS_TOKEN}`,
+                },
+            }
+        );
+
+        return res.data.id;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>): Promise<string> => {
+    const { postId, completeJson, userAgentData, ...form } = formData;
+    if (postId) {
+        return await updateMessageInLeadsChannel({ ...form, postId });
+    }
+    return await sendMessageToLeadsChannel(form);
 };
 
 const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
@@ -241,11 +306,22 @@ export const sendContactMail = async (form: Record<string, any>) => {
 
         console.debug("RECORD FOUND", isExistingRecord);
 
-        await sendDataToBambooTable(form, tableSlug);
-        if (!isExistingRecord) await sendMail(form);
+        const { postId, ...formData } = form;
+
+        await sendDataToBambooTable(formData, tableSlug);
+        if (!isExistingRecord) await sendMail(formData);
+
+        // Create or Update post in leads channel
+        const postIdRes = createOrUpdatePostInLeadsChannel({ ...formData, postId });
+        console.debug("POST_ID", postIdRes);
+
+        return postIdRes;
     } catch (err) {
         console.debug("Error sending request to bamboo: Sending to Mattermost", err);
         await sendMail(form);
+        // Create or Update post in leads channel
+        const postIdRes = createOrUpdatePostInLeadsChannel({ ...form });
+        console.debug("POST_ID", postIdRes);
     }
 };
 
