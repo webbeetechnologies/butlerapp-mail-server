@@ -4,14 +4,14 @@ import { sendContactMail, sendDemoMail } from "../mail";
 
 export const contactEmail = async (req: Request, res: Response): Promise<any> => {
     try {
-        await sendContactMail({
+        const postId = await sendContactMail({
             ...req.body,
             name: req.body.name || req.body.email,
             ipAddress: req.ip,
             xForwardedForIp: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
         });
 
-        return res.send({ message: "Success" });
+        return res.send({ message: "Success", postId });
     } catch (e) {
         console.error(e);
         return res.status(500).send();
