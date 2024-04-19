@@ -175,12 +175,33 @@ const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
     }
 };
 
-const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>): Promise<string> => {
-    const { postId, completeJson, userAgentData, ...form } = formData;
+const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) => {
+    const { postId, phone, website, country, date, utmCampaign, utmSource, utmTerm, campaignName } = formData;
+    if (!phone) return;
+
     if (postId) {
-        return await updateMessageInLeadsChannel({ ...form, postId });
+        return await updateMessageInLeadsChannel({
+            phone,
+            website,
+            country,
+            date: new Date(date).toLocaleString("de-DE"),
+            utmCampaign,
+            utmSource,
+            utmTerm,
+            campaignName,
+            postId,
+        });
     }
-    return await sendMessageToLeadsChannel(form);
+    return await sendMessageToLeadsChannel({
+        phone,
+        website,
+        country,
+        date,
+        utmCampaign,
+        utmSource,
+        utmTerm,
+        campaignName,
+    });
 };
 
 const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
@@ -312,7 +333,7 @@ export const sendContactMail = async (form: Record<string, any>) => {
         if (!isExistingRecord) await sendMail(formData);
 
         // Create or Update post in leads channel
-        const postIdRes = createOrUpdatePostInLeadsChannel({ ...formData, postId });
+        const postIdRes = await createOrUpdatePostInLeadsChannel({ ...formData, postId });
         console.debug("POST_ID", postIdRes);
 
         return postIdRes;
