@@ -177,7 +177,8 @@ const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
 
 const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) => {
     const { postId, phone, website, country, date, utmCampaign, utmSource, utmTerm, campaignName } = formData;
-    if (!phone) return;
+    // If there's no phone number, or the phone number includes the test phone number, don't send the message
+    if (!phone || ["495678", "495679"].includes(phone)) return;
 
     if (postId) {
         return await updateMessageInLeadsChannel({
