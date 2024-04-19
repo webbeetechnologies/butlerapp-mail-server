@@ -307,31 +307,31 @@ export const sendContactMail = async (form: Record<string, any>) => {
     // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
     const tableSlug = BAMBOO_TABLE_SLUG;
     try {
-        const findRecordQuery = `
-    query{
-        ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
-         records{
-          result{
-            id
-          }
-        }
-        }
-      }
-    `;
+        //     const findRecordQuery = `
+        // query{
+        //     ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
+        //      records{
+        //       result{
+        //         id
+        //       }
+        //     }
+        //     }
+        //   }
+        // `;
 
-        console.debug("FINDING RECORD", findRecordQuery, tableSlug);
+        //     console.debug("FINDING RECORD", findRecordQuery, tableSlug);
 
-        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
-        console.debug("FIND_RECORD_RESPONSE", res);
+        //     const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
+        //     console.debug("FIND_RECORD_RESPONSE", res);
 
-        const isExistingRecord = res[tableSlug].records.result[0]?.id;
+        //     const isExistingRecord = res[tableSlug].records.result[0]?.id;
 
-        console.debug("RECORD FOUND", isExistingRecord);
+        //     console.debug("RECORD FOUND", isExistingRecord);
 
         const { postId, ...formData } = form;
 
         await sendDataToBambooTable(formData, tableSlug);
-        if (!isExistingRecord) await sendMail(formData);
+        await sendMail(formData);
 
         // Create or Update post in leads channel
         const postIdRes = await createOrUpdatePostInLeadsChannel({ ...formData, postId });
