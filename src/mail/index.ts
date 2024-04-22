@@ -197,7 +197,7 @@ const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) =
         phone,
         website,
         country,
-        date,
+        date: new Date(date).toLocaleString("de-DE"),
         utmCampaign,
         utmSource,
         utmTerm,
