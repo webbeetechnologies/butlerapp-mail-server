@@ -176,7 +176,19 @@ const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
 };
 
 const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) => {
-    const { postId, phone, website, country, date, utmCampaign, utmSource, utmTerm, campaignName } = formData;
+    const {
+        postId,
+        phone,
+        website,
+        country,
+        date,
+        utmCampaign,
+        utmSource,
+        utmTerm,
+        campaignName,
+        demoURL,
+        email,
+    } = formData;
     // If there's no phone number, or the phone number includes the test phone number, don't send the message
     if (!phone || ["495678", "495679"].includes(phone)) return;
 
@@ -190,6 +202,8 @@ const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) =
             utmSource,
             utmTerm,
             campaignName,
+            demoURL,
+            email,
             postId,
         });
     }
@@ -202,6 +216,8 @@ const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) =
         utmSource,
         utmTerm,
         campaignName,
+        demoURL,
+        email,
     });
 };
 
