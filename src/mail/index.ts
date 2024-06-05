@@ -267,6 +267,7 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
                   _timestampId: initialForm?.timestampId,
                   _demoAccess: initialForm?.demoURL,
                   _screenResolution: initialForm?.screenResolution,
+                  _tags_fld2TIFNyJVVwymNs: initialForm?.tags,
               };
 
     // remove undefined keys from the object
