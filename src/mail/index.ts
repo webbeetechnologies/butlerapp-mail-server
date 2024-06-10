@@ -206,19 +206,20 @@ const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) =
             email,
             postId,
         });
+    } else {
+        return await sendMessageToLeadsChannel({
+            phone,
+            website,
+            country,
+            date: new Date(date).toLocaleString("de-DE"),
+            utmCampaign,
+            utmSource,
+            utmTerm,
+            campaignName,
+            demoURL,
+            email,
+        });
     }
-    return await sendMessageToLeadsChannel({
-        phone,
-        website,
-        country,
-        date: new Date(date).toLocaleString("de-DE"),
-        utmCampaign,
-        utmSource,
-        utmTerm,
-        campaignName,
-        demoURL,
-        email,
-    });
 };
 
 const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
