@@ -222,7 +222,11 @@ const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) =
     }
 };
 
-const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug = BAMBOO_TABLE_SLUG) => {
+const sendDataToBambooTable = async (
+    initialForm: Record<string, any>,
+    tableSlug = BAMBOO_TABLE_SLUG,
+    isExistingRecord?: boolean
+) => {
     console.debug("START: SENDING DATA TO BAMBOO TABLE", initialForm, tableSlug);
     // Map form fields to bamboo fields
     const form =
@@ -243,8 +247,6 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
                   _screenResolution: initialForm?.screenResolution,
               }
             : {
-                  _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
-                  _status_fldxG5PdWUBHPf0RK: "Not contacted",
                   _firma_fldZjcqfv8yPKDyea: initialForm?.name || initialForm[QUIZ_NESTED_FORM_KEY]?.name,
                   _apEMail_fldViznFWpT4RVJnZ: initialForm?.email || initialForm[QUIZ_NESTED_FORM_KEY]?.email,
                   _apTelefon1_fldPOqfODf7TAodQV:
@@ -268,7 +270,13 @@ const sendDataToBambooTable = async (initialForm: Record<string, any>, tableSlug
                   _timestampId: initialForm?.timestampId,
                   _demoAccess: initialForm?.demoURL,
                   _screenResolution: initialForm?.screenResolution,
-                  _tags_fld2TIFNyJVVwymNs: initialForm?.tags,
+                  ...(!isExistingRecord
+                      ? {
+                            _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
+                            _status_fldxG5PdWUBHPf0RK: "Not contacted",
+                            _tags_fld2TIFNyJVVwymNs: initialForm?.tags,
+                        }
+                      : {}),
               };
 
     // remove undefined keys from the object
@@ -325,30 +333,30 @@ export const sendContactMail = async (form: Record<string, any>) => {
     // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
     const tableSlug = BAMBOO_TABLE_SLUG;
     try {
-        //     const findRecordQuery = `
-        // query{
-        //     ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
-        //      records{
-        //       result{
-        //         id
-        //       }
-        //     }
-        //     }
-        //   }
-        // `;
+        const findRecordQuery = `
+        query{
+            ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
+             records{
+              result{
+                id
+              }
+            }
+            }
+          }
+        `;
 
-        //     console.debug("FINDING RECORD", findRecordQuery, tableSlug);
+        console.debug("FINDING RECORD", findRecordQuery, tableSlug);
 
-        //     const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
-        //     console.debug("FIND_RECORD_RESPONSE", res);
+        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
+        console.debug("FIND_RECORD_RESPONSE", res);
 
-        //     const isExistingRecord = res[tableSlug].records.result[0]?.id;
+        const isExistingRecord = res[tableSlug].records.result[0]?.id;
 
-        //     console.debug("RECORD FOUND", isExistingRecord);
+        console.debug("RECORD FOUND", isExistingRecord);
 
         const { postId, ...formData } = form;
 
-        await sendDataToBambooTable(formData, tableSlug);
+        await sendDataToBambooTable(formData, tableSlug, !!isExistingRecord);
         await sendMail(formData);
 
         // Create or Update post in leads channel
