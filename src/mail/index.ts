@@ -270,11 +270,11 @@ const sendDataToBambooTable = async (
                   _timestampId: initialForm?.timestampId,
                   _demoAccess: initialForm?.demoURL,
                   _screenResolution: initialForm?.screenResolution,
+                  _tags_fld2TIFNyJVVwymNs: initialForm?.tags,
                   ...(!isExistingRecord
                       ? {
                             _quelle_fldwPbyoIvdGPgmTi: "Butlerapp Inbound",
                             _status_fldxG5PdWUBHPf0RK: "Not contacted",
-                            _tags_fld2TIFNyJVVwymNs: initialForm?.tags,
                         }
                       : {}),
               };
