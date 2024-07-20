@@ -1,10 +1,26 @@
 import { Request, Response } from "express";
 
-import { sendContactMail, sendDemoMail } from "../mail";
+import { sendContactMail, sendContactMailTaylor, sendDemoMail } from "../mail";
 
 export const contactEmail = async (req: Request, res: Response): Promise<any> => {
     try {
         const postId = await sendContactMail({
+            ...req.body,
+            name: req.body.name || req.body.email,
+            ipAddress: req.ip,
+            xForwardedForIp: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+        });
+
+        return res.send({ message: "Success", ...(postId && { postId }) });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send();
+    }
+};
+
+export const contactTaylor = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const postId = await sendContactMailTaylor({
             ...req.body,
             name: req.body.name || req.body.email,
             ipAddress: req.ip,

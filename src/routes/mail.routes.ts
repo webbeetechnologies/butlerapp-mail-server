@@ -1,7 +1,7 @@
 import { Router } from "express";
 import asyncHandler from "express-async-handler";
 
-import { contactEmail, issueDemo } from "@/handlers/mail.handlers";
+import { contactEmail, contactTaylor, issueDemo } from "@/handlers/mail.handlers";
 
 const router = Router();
 
@@ -11,5 +11,6 @@ const router = Router();
  */
 router.post("/contact", asyncHandler(contactEmail));
 router.post("/demo", asyncHandler(issueDemo));
+router.post("/contact/taylor", asyncHandler(contactTaylor));
 
 export default router;

@@ -5,6 +5,8 @@ import nodemailer from "nodemailer";
 const MATTERMOST_INBOUNDS_CHANNEL_ID = "pp9amtzhebdy8bi7ikz6m3jjgw";
 const MATTERMOST_LEADS_CHANNEL_ID = "krr34khcafn75qffyfkxod9epa";
 
+const MATTERMOST_TAYLOR_LEADS_CHANNEL_ID = "68paz7mcgjbety533xhsnsxefy";
+
 import request from "graphql-request";
 
 import {
@@ -34,8 +36,6 @@ import {
 
 import { generateUniqueString, normalizeString, stringifyForGraphQL } from "./utils";
 
-// import { resetMailText } from "./texts";
-
 type MattermostPost = {
     id: string;
     [key: string]: any;
@@ -59,37 +59,7 @@ const isObject = (value: any) => {
     return value && typeof value === "object" && value.constructor === Object;
 };
 
-// Read Email Template Files
-// const resetEmailTemplatePath = path.join(__dirname, "template-reset.html");
-//
-// const resetEmailTemplate = fs
-//     .readFileSync(resetEmailTemplatePath, { encoding: "utf-8" })
-//     .replace(/{{domain}}/gm, CLIENT_ADDRESS)
-//     .replace(/{{site_name}}/gm, SITE_NAME);
-//
-// export const sendResetPasswordTokenMail = async (user: { email: string; token: string }) => {
-//     try {
-//         const mail = await transporter.sendMail({
-//             from: MAIL_FROM || MAIL_USER,
-//             to: user.email,
-//             subject: "Reset your password",
-//             text: resetMailText
-//                 .replace(/{{resetpassword}}/gm, user.token)
-//                 .replace(/{{domain}}/gm, CLIENT_ADDRESS),
-//             html: resetEmailTemplate
-//                 .replace(/{{resetpassword}}/gm, user.token)
-//                 .replace(/{{domain}}/gm, CLIENT_ADDRESS),
-//         });
-//
-//         if (!mail.accepted.length) {
-//             throw new Error("Couldn't send reset password email. Try again later.");
-//         }
-//     } catch (e) {
-//         console.log(e);
-//     }
-// };
-
-const sendMail = async (form: Record<string, any>) => {
+const sendMail = async (form: Record<string, any>, channelId: string) => {
     try {
         const text = `
             Contact Info: 
@@ -106,7 +76,7 @@ const sendMail = async (form: Record<string, any>) => {
         await axios.post(
             "https://mattermost.bambooapp.ai/api/v4/posts",
             {
-                channel_id: MATTERMOST_INBOUNDS_CHANNEL_ID,
+                channel_id: channelId,
                 message: text,
             },
             {
@@ -124,7 +94,7 @@ const sendMail = async (form: Record<string, any>) => {
     }
 };
 
-const sendMessageToLeadsChannel = async (form: Record<string, any>) => {
+const sendMessageToChannel = async (form: Record<string, any>, channelId: string) => {
     try {
         const text = Object.entries(form)
             .map(([key, value]) => `${key}: ${value}`)
@@ -133,7 +103,7 @@ const sendMessageToLeadsChannel = async (form: Record<string, any>) => {
         const res = await axios.post<MattermostPost>(
             "https://mattermost.bambooapp.ai/api/v4/posts",
             {
-                channel_id: MATTERMOST_LEADS_CHANNEL_ID,
+                channel_id: channelId,
                 message: text,
             },
             {
@@ -149,7 +119,7 @@ const sendMessageToLeadsChannel = async (form: Record<string, any>) => {
     }
 };
 
-const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
+const updateMessageInChannel = async (form: Record<string, any>) => {
     const { postId, ...formData } = form;
     try {
         const text = Object.entries(formData)
@@ -175,50 +145,27 @@ const updateMessageInLeadsChannel = async (form: Record<string, any>) => {
     }
 };
 
-const createOrUpdatePostInLeadsChannel = async (formData: Record<string, any>) => {
-    const {
-        postId,
-        phone,
-        website,
-        country,
-        date,
-        utmCampaign,
-        utmSource,
-        utmTerm,
-        campaignName,
-        demoURL,
-        email,
-    } = formData;
+const createOrUpdatePostInChannel = async (formData: Record<string, any>, channelId: string) => {
+    const { postId, date, phone, ...rest } = formData;
     // If there's no phone number, or the phone number includes the test phone number, don't send the message
-    if (!phone || ["495678", "495679"].includes(phone)) return;
+    // if (!phone || ["495678", "495679"].includes(phone)) return;
 
     if (postId) {
-        return await updateMessageInLeadsChannel({
+        return await updateMessageInChannel({
             phone,
-            website,
-            country,
             date: new Date(date).toLocaleString("de-DE"),
-            utmCampaign,
-            utmSource,
-            utmTerm,
-            campaignName,
-            demoURL,
-            email,
             postId,
+            ...rest,
         });
     } else {
-        return await sendMessageToLeadsChannel({
-            phone,
-            website,
-            country,
-            date: new Date(date).toLocaleString("de-DE"),
-            utmCampaign,
-            utmSource,
-            utmTerm,
-            campaignName,
-            demoURL,
-            email,
-        });
+        return await sendMessageToChannel(
+            {
+                phone,
+                date: new Date(date).toLocaleString("de-DE"),
+                ...rest,
+            },
+            channelId
+        );
     }
 };
 
@@ -329,6 +276,17 @@ const sendDataToBambooTable = async (
     }
 };
 
+export const sendContactMailTaylor = async (form: Record<string, any>) => {
+    try {
+        const postIdRes = await createOrUpdatePostInChannel(form, MATTERMOST_TAYLOR_LEADS_CHANNEL_ID);
+        console.debug("TAYLOR POST_ID", postIdRes);
+
+        return postIdRes;
+    } catch (err) {
+        console.debug("TAYLOR: Error sending to mattermost", err);
+    }
+};
+
 export const sendContactMail = async (form: Record<string, any>) => {
     // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
     const tableSlug = BAMBOO_TABLE_SLUG;
@@ -357,18 +315,73 @@ export const sendContactMail = async (form: Record<string, any>) => {
         const { postId, ...formData } = form;
 
         await sendDataToBambooTable(formData, tableSlug, !!isExistingRecord);
-        await sendMail(formData);
+        await sendMail(formData, MATTERMOST_INBOUNDS_CHANNEL_ID);
 
         // Create or Update post in leads channel
-        const postIdRes = await createOrUpdatePostInLeadsChannel({ ...formData, postId });
+        const {
+            phone,
+            website,
+            country,
+            date,
+            utmCampaign,
+            utmSource,
+            utmTerm,
+            campaignName,
+            demoURL,
+            email,
+        } = formData;
+        const postIdRes = await createOrUpdatePostInChannel(
+            {
+                postId,
+                phone,
+                website,
+                country,
+                date,
+                utmCampaign,
+                utmSource,
+                utmTerm,
+                campaignName,
+                demoURL,
+                email,
+            },
+            MATTERMOST_LEADS_CHANNEL_ID
+        );
         console.debug("POST_ID", postIdRes);
 
         return postIdRes;
     } catch (err) {
         console.debug("Error sending request to bamboo: Sending to Mattermost", err);
-        await sendMail(form);
+        await sendMail(form, MATTERMOST_INBOUNDS_CHANNEL_ID);
         // Create or Update post in leads channel
-        const postIdRes = createOrUpdatePostInLeadsChannel({ ...form });
+        const {
+            postId,
+            phone,
+            website,
+            country,
+            date,
+            utmCampaign,
+            utmSource,
+            utmTerm,
+            campaignName,
+            demoURL,
+            email,
+        } = form;
+        const postIdRes = createOrUpdatePostInChannel(
+            {
+                postId,
+                phone,
+                website,
+                country,
+                date,
+                utmCampaign,
+                utmSource,
+                utmTerm,
+                campaignName,
+                demoURL,
+                email,
+            },
+            MATTERMOST_LEADS_CHANNEL_ID
+        );
         console.debug("POST_ID", postIdRes);
     }
 };
