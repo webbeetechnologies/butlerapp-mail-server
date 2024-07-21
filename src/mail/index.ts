@@ -148,7 +148,7 @@ const updateMessageInChannel = async (form: Record<string, any>) => {
 const createOrUpdatePostInChannel = async (formData: Record<string, any>, channelId: string) => {
     const { postId, date, phone, ...rest } = formData;
     // If there's no phone number, or the phone number includes the test phone number, don't send the message
-    // if (!phone || ["495678", "495679"].includes(phone)) return;
+    if (!phone || ["495678", "495679"].includes(phone)) return;
 
     if (postId) {
         return await updateMessageInChannel({
