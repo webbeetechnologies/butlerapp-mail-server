@@ -7,7 +7,7 @@ const MATTERMOST_LEADS_CHANNEL_ID = "krr34khcafn75qffyfkxod9epa";
 
 const MATTERMOST_TAYLOR_LEADS_CHANNEL_ID = "68paz7mcgjbety533xhsnsxefy";
 
-import request, { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 
 import {
     BAMBOO_API_TOKEN,
@@ -301,6 +301,7 @@ export const sendContactMailTaylor = async (form: Record<string, any>) => {
 };
 
 const sendContactToMattermost = async (form: Record<string, any>) => {
+    console.debug("SENDING CONTACT TO MATTERMOST", form);
     const { postId, ...formData } = form;
 
     // Create or Update post in leads channel
