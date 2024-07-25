@@ -21,6 +21,8 @@ export const SITE_NAME = "My Site";
 export const BAMBOO_SERVER_HOST = process.env.BAMBOO_SERVER_HOST;
 export const BAMBOO_SERVER_APP_ID = process.env.BAMBOO_SERVER_APP_ID;
 export const BAMBOO_TABLE_SLUG = process.env.BAMBOO_TABLE_SLUG;
+export const BAMBOO_API_TOKEN = process.env.BAMBOO_API_TOKEN;
+export const BAMBOO_CLIENT_ID = process.env.BAMBOO_CLIENT_ID;
 export const COURSE_CONFIGURATOR_TABLE_SLUG = process.env.COURSE_CONFIGURATOR_TABLE_SLUG;
 export const QUIZ_NESTED_FORM_KEY = "Deine Demoversion steht bereit";
 

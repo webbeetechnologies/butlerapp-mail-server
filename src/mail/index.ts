@@ -7,9 +7,11 @@ const MATTERMOST_LEADS_CHANNEL_ID = "krr34khcafn75qffyfkxod9epa";
 
 const MATTERMOST_TAYLOR_LEADS_CHANNEL_ID = "68paz7mcgjbety533xhsnsxefy";
 
-import request from "graphql-request";
+import request, { GraphQLClient } from "graphql-request";
 
 import {
+    BAMBOO_API_TOKEN,
+    BAMBOO_CLIENT_ID,
     BAMBOO_SERVER_APP_ID,
     BAMBOO_SERVER_HOST,
     BAMBOO_TABLE_SLUG,
@@ -33,6 +35,15 @@ import {
     MATTERMOST_MAIL_BOT_ACCESS_TOKEN,
     QUIZ_NESTED_FORM_KEY,
 } from "@/utils/constants";
+
+const endpoint = `${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`;
+
+const graphqlClient = new GraphQLClient(endpoint, {
+    headers: {
+        Authorization: `Bearer ${BAMBOO_API_TOKEN}`,
+        "client-id": BAMBOO_CLIENT_ID,
+    },
+});
 
 import { generateUniqueString, normalizeString, stringifyForGraphQL } from "./utils";
 
@@ -151,14 +162,15 @@ const createOrUpdatePostInChannel = async (formData: Record<string, any>, channe
     if (!phone || ["495678", "495679"].includes(phone)) return;
 
     if (postId) {
-        return await updateMessageInChannel({
+        const res = await updateMessageInChannel({
             phone,
             date: new Date(date).toLocaleString("de-DE"),
             postId,
             ...rest,
         });
+        return res;
     } else {
-        return await sendMessageToChannel(
+        const res = await sendMessageToChannel(
             {
                 phone,
                 date: new Date(date).toLocaleString("de-DE"),
@@ -166,6 +178,7 @@ const createOrUpdatePostInChannel = async (formData: Record<string, any>, channe
             },
             channelId
         );
+        return res;
     }
 };
 
@@ -269,7 +282,7 @@ const sendDataToBambooTable = async (
         }
         `;
         console.debug("GraphQL Query:", mutationQuery);
-        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, mutationQuery);
+        const res = await graphqlClient.request(mutationQuery);
         console.debug("GraphQL Response:", res);
     } catch (error) {
         console.error(error);
@@ -287,73 +300,14 @@ export const sendContactMailTaylor = async (form: Record<string, any>) => {
     }
 };
 
-export const sendContactMail = async (form: Record<string, any>) => {
-    // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
-    const tableSlug = BAMBOO_TABLE_SLUG;
-    try {
-        const findRecordQuery = `
-        query{
-            ${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
-             records{
-              result{
-                id
-              }
-            }
-            }
-          }
-        `;
+const sendContactToMattermost = async (form: Record<string, any>) => {
+    const { postId, ...formData } = form;
 
-        console.debug("FINDING RECORD", findRecordQuery, tableSlug);
-
-        const res = await request(`${BAMBOO_SERVER_HOST}/${BAMBOO_SERVER_APP_ID}`, findRecordQuery);
-        console.debug("FIND_RECORD_RESPONSE", res);
-
-        const isExistingRecord = res[tableSlug].records.result[0]?.id;
-
-        console.debug("RECORD FOUND", isExistingRecord);
-
-        const { postId, ...formData } = form;
-
-        await sendDataToBambooTable(formData, tableSlug, !!isExistingRecord);
-        await sendMail(formData, MATTERMOST_INBOUNDS_CHANNEL_ID);
-
-        // Create or Update post in leads channel
-        const {
-            phone,
-            website,
-            country,
-            date,
-            utmCampaign,
-            utmSource,
-            utmTerm,
-            campaignName,
-            demoURL,
-            email,
-        } = formData;
-        const postIdRes = await createOrUpdatePostInChannel(
-            {
-                postId,
-                phone,
-                website,
-                country,
-                date,
-                utmCampaign,
-                utmSource,
-                utmTerm,
-                campaignName,
-                demoURL,
-                email,
-            },
-            MATTERMOST_LEADS_CHANNEL_ID
-        );
-        console.debug("POST_ID", postIdRes);
-
-        return postIdRes;
-    } catch (err) {
-        console.debug("Error sending request to bamboo: Sending to Mattermost", err);
-        await sendMail(form, MATTERMOST_INBOUNDS_CHANNEL_ID);
-        // Create or Update post in leads channel
-        const {
+    // Create or Update post in leads channel
+    const { phone, website, country, date, utmCampaign, utmSource, utmTerm, campaignName, demoURL, email } =
+        formData;
+    const postIdRes = await createOrUpdatePostInChannel(
+        {
             postId,
             phone,
             website,
@@ -365,24 +319,65 @@ export const sendContactMail = async (form: Record<string, any>) => {
             campaignName,
             demoURL,
             email,
-        } = form;
-        const postIdRes = createOrUpdatePostInChannel(
-            {
-                postId,
-                phone,
-                website,
-                country,
-                date,
-                utmCampaign,
-                utmSource,
-                utmTerm,
-                campaignName,
-                demoURL,
-                email,
-            },
-            MATTERMOST_LEADS_CHANNEL_ID
-        );
-        console.debug("POST_ID", postIdRes);
+        },
+        MATTERMOST_LEADS_CHANNEL_ID
+    );
+    console.debug("POST_ID", postIdRes);
+
+    return postIdRes;
+};
+
+const sendContactToBamboo = async (form: Record<string, any>) => {
+    const { postId, ...formData } = form;
+
+    // const tableSlug = form?.eventType ? COURSE_CONFIGURATOR_TABLE_SLUG : BAMBOO_TABLE_SLUG;
+    const tableSlug = BAMBOO_TABLE_SLUG;
+    const findRecordQuery = `
+		query{
+				${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
+				 records{
+					result{
+						id
+					}
+				}
+				}
+			}
+		`;
+
+    console.debug("FINDING RECORD", findRecordQuery, tableSlug);
+    console.log("Request config", graphqlClient.requestConfig);
+
+    const res = await graphqlClient.request(findRecordQuery);
+    console.debug("FIND_RECORD_RESPONSE", res);
+
+    const isExistingRecord = res[tableSlug].records.result[0]?.id;
+
+    console.debug("RECORD FOUND", isExistingRecord);
+
+    await sendDataToBambooTable(formData, tableSlug, !!isExistingRecord);
+};
+
+export const sendContactMail = async (form: Record<string, any>) => {
+    const { postId, ...formData } = form;
+
+    try {
+        const [mattermostRes, bambooRes] = await Promise.allSettled([
+            sendContactToMattermost(form),
+            sendContactToBamboo(form),
+            sendMail(formData, MATTERMOST_INBOUNDS_CHANNEL_ID),
+        ]);
+
+        console.debug("POST_RES_ID", mattermostRes);
+        console.debug("BAMBOO_RES_ID", bambooRes.status === "fulfilled" ? bambooRes.value : bambooRes.reason);
+
+        if (mattermostRes.status !== "fulfilled") {
+            throw new Error(mattermostRes.reason);
+        }
+
+        return mattermostRes.value;
+    } catch (err) {
+        console.debug("Error sending request to bamboo: Sending to Mattermost", err);
+        await sendMail(form, MATTERMOST_INBOUNDS_CHANNEL_ID);
     }
 };
 
