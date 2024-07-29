@@ -337,10 +337,8 @@ const sendContactToBamboo = async (form: Record<string, any>) => {
 		query{
 				${tableSlug}(filtersSet: {conjunction: and, filtersSet: [{field: _timestampId, operator: "contains", value: ["${form.timestampId}"]}]}){
 				 records{
-					result{
 						id
 					}
-				}
 				}
 			}
 		`;
@@ -351,7 +349,7 @@ const sendContactToBamboo = async (form: Record<string, any>) => {
     const res = await graphqlClient.request(findRecordQuery);
     console.debug("FIND_RECORD_RESPONSE", res);
 
-    const isExistingRecord = res[tableSlug].records.result[0]?.id;
+    const isExistingRecord = res[tableSlug].records[0]?.id;
 
     console.debug("RECORD FOUND", isExistingRecord);
 
